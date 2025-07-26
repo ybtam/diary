@@ -1,0 +1,66 @@
+{
+  "name": "@repo/ui",
+  "version": "1.3.1",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": "./src/index.tsx",
+    "./lib": "./src/lib/index.ts",
+    "./components": "./src/components/index.ts",
+    "./hooks": "./src/hooks/index.ts",
+    "./styles.css": "./dist/index.css",
+    "./theme.css": "./src/styles/theme.css",
+    "./forms": "./src/forms/index.ts",
+    "./inputs": "./src/inputs/index.ts"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "npx @tailwindcss/cli -i src/styles/style.css -o ./dist/index.css",
+    "lint": "eslint './**'",
+    "lint:fix": "eslint './**' --fix",
+    "dev": "npx @tailwindcss/cli -i src/styles/style.css -o ./dist/index.css --watch",
+    "type-check": "tsc --noEmit",
+    "shadcn": "pnpm dlx shadcn@canary"
+  },
+  "peerDependencies": {
+    "@hookform/resolvers": "^5.0.1",
+    "@tailwindcss/postcss": "^4.0.7",
+    "@tanstack/react-query": "^5.74.4",
+    "@types/react": "^19.1.2",
+    "next": "^15.3.1",
+    "react": "^19.1.0",
+    "tailwindcss": "^4.1.4",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@repo/config-eslint": "workspace:*",
+    "@repo/config-prettier": "workspace:*",
+    "@repo/config-typescript": "workspace:*",
+    "@tailwindcss/cli": "^4.1.11",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^24.1.0",
+    "eslint": "^9.32.0",
+    "prettier-plugin-tailwindcss": "^0.6.14"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tooltip": "^1.2.7",
+    "@tailwindcss/typography": "^0.5.16",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.525.0",
+    "prettier": "^3.6.2",
+    "react-hook-form": "^7.61.1",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^4.0.10"
+  }
+}

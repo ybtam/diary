@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "Node16",               // Generate ES module code
+    "moduleResolution": "node16",       // Node.js module resolution
+    "rootDir": "./src",               // Source directory
+    "esModuleInterop": true,          // Enables compatibility with CommonJS
+    "strict": true,                   // Enable strict type checking
+    "skipLibCheck": true,             // Skip type checking of all declaration files
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "allowImportingTsExtensions": true
+  },
+  "ts-node": {
+    "esm": true
+  },
+  "include": ["./src/**/*", "./test/**/*"],
+  "exclude": ["node_modules"]
+}

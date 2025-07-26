@@ -1,0 +1,41 @@
+{
+  "name": "web",
+  "version": "0.1.1",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.0",
+    "@repo/sdk": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "@tanstack/react-query": "^5.83.0",
+    "lucide-react": "^0.525.0",
+    "next": "^15.4.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.61.1",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^4.0.10"
+  },
+  "devDependencies": {
+    "@apps/api": "workspace:*",
+    "@repo/config-eslint": "workspace:*",
+    "@repo/config-prettier": "workspace:*",
+    "@repo/config-typescript": "workspace:*",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^24.1.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "eslint": "^9.32.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.8.3"
+  }
+}

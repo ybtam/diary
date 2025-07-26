@@ -1,0 +1,11 @@
+packages:
+  - apps/**/*
+  - packages/*
+  - tests/*
+
+onlyBuiltDependencies:
+  - '@sentry/cli'
+  - core-js
+  - esbuild
+  - sharp
+  - cypress

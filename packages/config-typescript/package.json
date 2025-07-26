@@ -1,0 +1,16 @@
+{
+  "name": "@repo/config-typescript",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "lucide-react": "^0.525.0",
+    "zod": "^4.0.10"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "@apps/db",
+  "version": "1.0.1",
+  "description": "",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schemas/index.ts",
+    "./zod": "./src/schemas/zod.ts"
+  },
+  "scripts": {
+    "dev": "dotenv -e ../../.env drizzle-kit studio --port 4001",
+    "db:push": "dotenv -e ../../.env -- drizzle-kit push",
+    "migration:new": "dotenv -e ../../.env -- drizzle-kit generate",
+    "migrate:up": "dotenv -e ../../.env -- drizzle-kit migrate",
+    "build": "tsc",
+    "lint": "eslint './**'",
+    "lint:fix": "eslint './**' --fix",
+    "db:create": "dotenv -e ../../.env -- tsx src/utils/create-db.ts",
+    "type-check": "tsc --noEmit",
+    "generate:export-schema": "tsx src/utils/generate-export-schema.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "pg": "^8.14.1"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.3",
+    "drizzle-zod": "^0.8.2",
+    "glob": "^11.0.3",
+    "lucide-react": "^0.525.0",
+    "zod": "^4.0.10"
+  },
+  "devDependencies": {
+    "@repo/config-eslint": "workspace:*",
+    "@repo/config-prettier": "workspace:*",
+    "@repo/config-typescript": "workspace:*",
+    "@types/node": "^24.1.0",
+    "@types/pg": "^8.15.4",
+    "drizzle-kit": "^0.31.4",
+    "eslint": "^9.32.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    "**/.env.*local",
+    ".env"
+  ],
+  "globalEnv": [
+    "DB_HOST",
+    "DB_NAME",
+    "DB_USERNAME",
+    "DB_PASSWORD",
+    "JWT_TOKEN",
+    "AUTH_SECRET",
+    "AUTH_TRUST_HOST",
+    "API_URL",
+    "NEXT_PUBLIC_API_URL",
+    "CALLBACK_URL_COOKIE_NAME",
+    "CSRF_TOKEN_COOKIE_NAME",
+    "SESSION_TOKEN_COOKIE_NAME"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "lint": {},
+    "lint:fix": {},
+    "type-check": {},
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "clean": {
+      "cache": false
+    },
+    "test": {
+      "cache": false
+    },
+    "start": {},
+    "migrate:up": {
+      "cache": false
+    }
+  }
+}

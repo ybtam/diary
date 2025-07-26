@@ -1,0 +1,20 @@
+{
+  "name": "@repo/config-prettier",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base.js": "./base.js",
+    "./react.js": "./react.js"
+  },
+  "peerDependencies": {
+    "prettier": "^3.5.3"
+  },
+  "devDependencies": {
+    "prettier-plugin-tailwindcss": "^0.6.14"
+  },
+  "dependencies": {
+    "lucide-react": "^0.525.0",
+    "zod": "^4.0.10"
+  }
+}
