@@ -4,8 +4,10 @@ packages:
   - tests/*
 
 onlyBuiltDependencies:
+  - '@parcel/watcher'
   - '@sentry/cli'
+  - '@tailwindcss/oxide'
   - core-js
+  - cypress
   - esbuild
   - sharp
-  - cypress
