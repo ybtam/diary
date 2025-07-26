@@ -1,5 +1,5 @@
 #todo change name
-name: mono-kadze-repo
+name: diary-app
 services:
   db:
     image: postgres:latest
