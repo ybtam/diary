@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
 export const loginInputSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string(),
 })

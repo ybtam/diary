@@ -9,5 +9,3 @@ export const insertUserSchema = createInsertSchema(users, {
   lastName: z.string().optional().nullable(),
   password: z.string(),
 })
-
-export type InsertIntoUsersInput = z.infer<typeof insertUserSchema>
