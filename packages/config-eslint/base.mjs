@@ -20,7 +20,7 @@ export default tseslint.config([
     "**/node_modules",
     "**/postcss.config.js",
     "**/.next",
-    "**/.prettierrc.js",
+    "**/.prettierrc.mjs",
   ]),
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
