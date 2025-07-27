@@ -3,7 +3,7 @@
 
 /*@import '@repo/ui/styles.css';*/
 
-@source "../../node_modules/@repo/ui/src";
+@source "../../../../packages/ui/src";
 
 @layer base {
     *,
