@@ -17,7 +17,7 @@ const update = protectedProcedure.input(updateDiaryEntrySchema).mutation(async (
   return db.update(diaryEntries).set(dataToUpdate).where(eq(diaryEntries.id, id))
 })
 
-const remove = protectedProcedure
+const delete = protectedProcedure
   .input(z.object({ id: z.number() }))
   .mutation(async ({ input }) => {
     return db.delete(diaryEntries).where(eq(diaryEntries.id, input.id))
@@ -25,6 +25,6 @@ const remove = protectedProcedure
 
 export default {
   create,
-  delete: remove,
+  delete,
   update,
 }
