@@ -1,16 +1,21 @@
 # Tamyikadze base template
 
-## Copy template
+This is a monorepo for a full-stack application.
 
-```bash
-pnpm dlx create-turbo@latest --example https://github.com/tamyikadze/mono-kadze-repo.git
-```
+## Packages
 
+- [`apps/api`](./apps/api/README.md): The API for the application.
+- [`apps/db`](./apps/db/README.md): The database schema and migrations.
+- [`apps/web`](./apps/web/README.md): The web application.
+- [`packages/config-eslint`](./packages/config-eslint/README.md): ESLint configurations.
+- [`packages/config-prettier`](./packages/config-prettier/README.md): Prettier configurations.
+- [`packages/config-typescript`](./packages/config-typescript/README.md): TypeScript configurations.
+- [`packages/sdk`](./packages/sdk/README.md): The SDK for the application.
+- [`packages/ui`](./packages/ui/README.md): The UI components for the application.
 
 ## Getting Started
 
 First change the project name in the `package.json` and `./docker/docker-compose.local-dev.yml` files.
-
 
 Copy the `.env.example` file to `.env` and fill in the values.
 
