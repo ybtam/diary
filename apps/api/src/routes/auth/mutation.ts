@@ -1,4 +1,6 @@
 import { db, users } from '@apps/db'
+import { insertUserSchema } from '@apps/db/zod'
+import { TRPCError } from '@trpc/server'
 import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
@@ -19,6 +21,28 @@ const login = publicProcedure.input(loginInputSchema).mutation(async ({ input })
   const { accessToken, refreshToken } = generateTokens({ email: user.email, userId: user.id })
 
   return { accessToken, expiresIn: 3600, refreshToken }
+})
+
+const register = publicProcedure.input(insertUserSchema).mutation(async ({ input }) => {
+  const existingUser = await db.query.users.findFirst({
+    where: eq(users.email, input.email),
+  })
+
+  if (existingUser) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: 'User with this email already exists.',
+    })
+  }
+
+  const hashedPassword = await bcrypt.hash(input.password, 10)
+
+  const newUser = await db
+    .insert(users)
+    .values({ ...input, password: hashedPassword })
+    .returning()
+
+  return newUser[0]
 })
 
 const generateAccessToken = publicProcedure
@@ -48,4 +72,5 @@ const generateAccessToken = publicProcedure
 export default {
   generateAccessToken,
   login,
+  register,
 }
