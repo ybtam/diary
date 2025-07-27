@@ -1,0 +1,24 @@
+name: 'Setup Node.js, pnpm, and Install Dependencies'
+description: 'Checks out code, sets up Node.js and pnpm, and installs dependencies with caching.'
+
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: true
+    default: '20.x' # Setting a sensible default is good practice
+
+runs:
+  using: "composite" # This is the magic key!
+  steps:
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+
+    - name: Use Node.js ${{ inputs.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install

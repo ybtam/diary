@@ -1,15 +1,16 @@
 'use client'
 
-import { InsertIntoUsersInput, insertUserSchema } from '@apps/db/zod'
+import { insertUserSchema } from '@apps/api/zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, Input } from '@repo/ui'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 import { register } from './action'
 
 export const RegistrationForm = () => {
-  const form = useForm<InsertIntoUsersInput>({
+  const form = useForm({
     defaultValues: {
       email: '',
       firstName: '',
@@ -20,7 +21,7 @@ export const RegistrationForm = () => {
   })
 
   const { isPending, mutate } = useMutation({
-    mutationFn: (data: InsertIntoUsersInput) => register(data),
+    mutationFn: (data: z.output<typeof insertUserSchema>) => register(data),
   })
 
   return (
