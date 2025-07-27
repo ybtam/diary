@@ -10,7 +10,7 @@ import { z } from 'zod'
 import { login } from './action'
 
 export const LoginForm = () => {
-  const form = useForm<z.infer<typeof loginInputSchema>>({
+  const form = useForm({
     defaultValues: {
       email: '',
       password: '',
