@@ -2,12 +2,12 @@
 
 import { loginInputSchema } from '@apps/api/zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTRPC } from '@repo/sdk'
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, Input } from '@repo/ui'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 
-import { login } from './action'
+import { login } from '@/app/@public/_components/login-form/action.ts'
 
 export const LoginForm = () => {
   const form = useForm({
@@ -18,9 +18,18 @@ export const LoginForm = () => {
     resolver: zodResolver(loginInputSchema),
   })
 
-  const { isPending, mutate } = useMutation({
-    mutationFn: (data: z.infer<typeof loginInputSchema>) => login(data),
-  })
+  const trpc = useTRPC()
+
+  const { isPending, mutate } = useMutation(
+    trpc.auth.login.mutationOptions({
+      onError: error => {
+        console.log(error)
+      },
+      onSuccess: async data => {
+        await login(data)
+      },
+    }),
+  )
 
   return (
     <Form {...form}>

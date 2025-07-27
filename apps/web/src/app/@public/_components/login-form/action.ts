@@ -1,9 +1,11 @@
 'use server'
 
-import { loginInputSchema } from '@apps/api/zod'
 import { signIn } from '@repo/sdk/auth'
-import { z } from 'zod'
 
-export const login = async (data: z.infer<typeof loginInputSchema>) => {
+export const login = async (data: {
+  accessToken: string
+  expiresIn: number
+  refreshToken: string
+}) => {
   await signIn('credentials', data)
 }
