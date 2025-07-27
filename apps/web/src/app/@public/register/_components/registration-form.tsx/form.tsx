@@ -2,12 +2,12 @@
 
 import { insertUserSchema } from '@apps/api/zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTRPC } from '@repo/sdk'
 import { Button, Form, FormControl, FormField, FormItem, FormLabel, Input } from '@repo/ui'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 
-import { register } from './action'
+import { login } from '@/app/@public/_components/login-form/action.ts'
 
 export const RegistrationForm = () => {
   const form = useForm({
@@ -20,9 +20,18 @@ export const RegistrationForm = () => {
     resolver: zodResolver(insertUserSchema),
   })
 
-  const { isPending, mutate } = useMutation({
-    mutationFn: (data: z.output<typeof insertUserSchema>) => register(data),
-  })
+  const trpc = useTRPC()
+
+  const { error, isPending, mutate } = useMutation(
+    trpc.auth.register.mutationOptions({
+      onSuccess: async data => {
+        await login(data)
+      },
+      onError: error => {
+        console.log(error)
+      }
+    }),
+  )
 
   return (
     <Form {...form}>
@@ -74,6 +83,7 @@ export const RegistrationForm = () => {
         <Button isPending={isPending} type="submit">
           Register
         </Button>
+        {error && <p className="text-red-500">{error.message}</p>}
       </form>
     </Form>
   )

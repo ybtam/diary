@@ -1,8 +1,6 @@
-'use client'
-
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui'
 
-import { RegistrationForm } from '../_components/registration-form.tsx/form'
+import { RegistrationForm } from '@/app/@public/register/_components/registration-form.tsx/form'
 
 const RegisterPage = () => {
   return (
