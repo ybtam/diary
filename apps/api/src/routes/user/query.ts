@@ -7,6 +7,9 @@ const list = publicProcedure.query(async () => {
     columns: {
       password: false,
     },
+    with: {
+      diaries: true,
+    },
   })
 })
 

@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
 import pg from 'pg'
 
-import * as Schemas from './schemas/index.ts'
+import * as schema from './schemas/index.ts'
 const { Client } = pg
 
 export const client = new Client({
@@ -13,7 +13,7 @@ export const client = new Client({
 })
 
 export const db = drizzle(client, {
-  schema: Schemas,
+  schema,
 })
 
 export * from './schemas/index.ts'

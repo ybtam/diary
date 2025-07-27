@@ -1,4 +1,7 @@
+import { relations } from 'drizzle-orm'
 import { jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
+
+import { diaryEntries } from '../diary/schema'
 
 export const users = pgTable('users', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -13,3 +16,7 @@ export const users = pgTable('users', {
     .notNull()
     .$onUpdate(() => new Date()),
 })
+
+export const userRelations = relations(users, ({ many }) => ({
+  diaries: many(diaryEntries),
+}))
