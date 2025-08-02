@@ -32,6 +32,9 @@ RUN adduser --system --uid 1001 api
 # Copy everything from installer stage
 COPY --from=installer --chown=api:nodejs /app .
 
+# Create turbo cache directory with correct permissions
+RUN mkdir -p /app/.turbo/cache && chown -R api:nodejs /app/.turbo
+
 USER api
 
 EXPOSE 4000
