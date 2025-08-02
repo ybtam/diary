@@ -7,8 +7,6 @@ export const SessionHandler = () => {
   const { data: session } = useSession()
 
   useEffect(() => {
-    console.log(session)
-
     if (session?.error === 'RefreshTokenError') {
       signOut()
     }
