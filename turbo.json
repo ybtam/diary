@@ -5,6 +5,7 @@
     ".env"
   ],
   "globalEnv": [
+    "DATABASE_URL",
     "DB_HOST",
     "DB_NAME",
     "DB_USERNAME",
