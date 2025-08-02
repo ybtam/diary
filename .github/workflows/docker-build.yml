@@ -1,0 +1,207 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/docker-build.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/docker-build.yml'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository }}
+
+jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.changes.outputs.api }}
+      web: ${{ steps.changes.outputs.web }}
+      db: ${{ steps.changes.outputs.db }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+              - 'apps/db/**'
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+            web:
+              - 'apps/web/**'
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+            db:
+              - 'apps/db/**'
+              - 'pnpm-lock.yaml'
+
+  build-api:
+    name: Build API Image
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/api
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/api/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-web:
+    name: Build Web Image
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/web
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/web/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-db-migration:
+    name: Build DB Migration Image
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.db == 'true'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/db-migration
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/db/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  update-gitops:
+    name: Update GitOps Repository
+    runs-on: ubuntu-latest
+    needs: [build-api, build-web, build-db-migration]
+    if: always() && github.ref == 'refs/heads/main' && (needs.build-api.result == 'success' || needs.build-web.result == 'success' || needs.build-db-migration.result == 'success')
+    steps:
+      - name: Update GitOps Repository
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITOPS_TOKEN }}
+          repository: ${{ secrets.GITOPS_REPOSITORY }}
+          event-type: update-image
+          client-payload: |
+            {
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}",
+              "api_image": "${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}",
+              "web_image": "${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}",
+              "db_migration_image": "${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}",
+              "updated_by": "${{ github.actor }}"
+            }
