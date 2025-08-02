@@ -24,11 +24,11 @@ export const RegistrationForm = () => {
 
   const { error, isPending, mutate } = useMutation(
     trpc.auth.register.mutationOptions({
-      onSuccess: async data => {
-        await login(data)
-      },
       onError: error => {
         console.log(error)
+      },
+      onSuccess: async data => {
+        await login(data)
       }
     }),
   )
