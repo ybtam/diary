@@ -1,0 +1,100 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: diary-migration
+  labels:
+    app: diary-migration
+    component: migration
+spec:
+  ttlSecondsAfterFinished: 3600 # Clean up after 1 hour
+  template:
+    metadata:
+      labels:
+        app: diary-migration
+        component: migration
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: migration
+        image: ghcr.io/your-username/diary/db-migration:latest
+        command: ["pnpm", "migrate:prod"]
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: DATABASE_URL
+        - name: NODE_ENV
+          value: production
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+            - ALL
+      # Ensure database is ready before running migrations
+      initContainers:
+      - name: wait-for-db
+        image: postgres:16-alpine
+        command: ['sh', '-c']
+        args:
+        - |
+          until pg_isready -h postgres -p 5432 -U diary_user; do
+            echo "Waiting for database..."
+            sleep 2
+          done
+          echo "Database is ready!"
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+---
+# Alternative: CronJob for scheduled migrations (useful for dev environments)
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: diary-migration-scheduled
+  labels:
+    app: diary-migration
+    component: scheduled-migration
+spec:
+  schedule: "0 2 * * *" # Run daily at 2 AM
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 3600
+      template:
+        metadata:
+          labels:
+            app: diary-migration
+            component: scheduled-migration
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: migration
+            image: ghcr.io/your-username/diary/db-migration:latest
+            command: ["pnpm", "migrate:prod"]
+            env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DATABASE_URL
+            - name: NODE_ENV
+              value: production
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "100m"
+              limits:
+                memory: "256Mi"
+                cpu: "200m"

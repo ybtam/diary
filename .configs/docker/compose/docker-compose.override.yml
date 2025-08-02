@@ -1,0 +1,60 @@
+# Override for development with hot reload
+version: '3.8'
+
+services:
+  api:
+    build:
+      target: base  # Use base stage for development
+    command: ["pnpm", "dev", "--filter", "@apps/api"]
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ../../../:/app
+      - /app/node_modules
+      - /app/apps/api/node_modules
+      - /app/apps/db/node_modules
+    ports:
+      - "3001:3001"
+      - "9229:9229"  # Debug port
+
+  web:
+    build:
+      target: base  # Use base stage for development
+    command: ["pnpm", "dev", "--filter", "web"]
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ../../../:/app
+      - /app/node_modules
+      - /app/apps/web/node_modules
+    ports:
+      - "3000:3000"
+
+  # Development tools
+  adminer:
+    image: adminer:4-standalone
+    container_name: diary-adminer
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    networks:
+      - diary-network
+    profiles:
+      - tools
+
+  redis:
+    image: redis:7-alpine
+    container_name: diary-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - diary-network
+    profiles:
+      - cache
+
+volumes:
+  redis_data:
+    driver: local
