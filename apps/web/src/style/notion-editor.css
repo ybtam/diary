@@ -1,0 +1,99 @@
+/* Notion-like editor styles */
+.notion-editor {
+  @apply relative;
+}
+
+.notion-editor .ProseMirror {
+  @apply min-h-[calc(100vh-12rem)] px-0 py-4;
+}
+
+.notion-editor .ProseMirror:focus {
+  @apply outline-none;
+}
+
+/* Typography */
+.notion-editor .ProseMirror h1 {
+  @apply mb-4 mt-8 text-3xl font-bold;
+}
+
+.notion-editor .ProseMirror h2 {
+  @apply mb-3 mt-6 text-2xl font-semibold;
+}
+
+.notion-editor .ProseMirror h3 {
+  @apply mb-2 mt-4 text-xl font-semibold;
+}
+
+.notion-editor .ProseMirror p {
+  @apply mb-2 leading-relaxed;
+}
+
+.notion-editor .ProseMirror ul,
+.notion-editor .ProseMirror ol {
+  @apply mb-4 ml-6;
+}
+
+.notion-editor .ProseMirror li {
+  @apply mb-1;
+}
+
+.notion-editor .ProseMirror blockquote {
+  @apply my-4 border-l-3 border-gray-300 pl-4 italic;
+}
+
+.notion-editor .ProseMirror code {
+  @apply rounded bg-gray-100 px-1 py-0.5 font-mono text-sm;
+}
+
+.notion-editor .ProseMirror pre {
+  @apply my-4 overflow-x-auto rounded-lg bg-gray-900 p-4;
+}
+
+.notion-editor .ProseMirror pre code {
+  @apply bg-transparent text-gray-100;
+}
+
+/* Selection */
+.notion-editor .ProseMirror ::selection {
+  @apply bg-blue-100;
+}
+
+/* Placeholder */
+.notion-editor .ProseMirror.is-empty::before {
+  content: attr(data-placeholder);
+  @apply pointer-events-none absolute text-gray-400;
+}
+
+/* Focus styles */
+.notion-editor .ProseMirror:focus-visible {
+  @apply outline-none;
+}
+
+/* Links */
+.notion-editor .ProseMirror a {
+  @apply cursor-pointer text-blue-600 underline hover:text-blue-800;
+}
+
+/* Images */
+.notion-editor .ProseMirror img {
+  @apply my-4 max-w-full rounded;
+}
+
+/* Tables */
+.notion-editor .ProseMirror table {
+  @apply my-4 w-full border-collapse;
+}
+
+.notion-editor .ProseMirror th,
+.notion-editor .ProseMirror td {
+  @apply border border-gray-300 px-3 py-2;
+}
+
+.notion-editor .ProseMirror th {
+  @apply bg-gray-50 font-semibold;
+}
+
+/* Horizontal rule */
+.notion-editor .ProseMirror hr {
+  @apply my-8 border-t border-gray-300;
+}

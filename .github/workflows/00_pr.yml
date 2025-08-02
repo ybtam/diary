@@ -22,7 +22,7 @@ jobs:
         run: pnpm changeset status --since=origin/main
 
   lint-check:
-    name: Lint & Type Check
+    name: Lint Check
     needs:
       - changeset-check
     runs-on: ubuntu-latest
@@ -39,7 +39,7 @@ jobs:
         run: pnpm turbo run lint
 
   type-check:
-    name: Lint & Type Check
+    name: Type Check
     needs:
       - changeset-check
     runs-on: ubuntu-latest

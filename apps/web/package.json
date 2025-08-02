@@ -14,7 +14,9 @@
     "@hookform/resolvers": "^5.2.0",
     "@repo/sdk": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@tanstack/react-pacer": "^0.13.0",
     "@tanstack/react-query": "^5.83.0",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.525.0",
     "next": "^15.4.4",
     "react": "^19.1.0",
@@ -35,8 +37,8 @@
     "eslint": "^9.32.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4.1.11",
-    "typescript": "^5.8.3",
-    "prettier-plugin-tailwindcss": "^0.6.14"
+    "typescript": "^5.8.3"
   }
 }

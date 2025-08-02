@@ -1,23 +1,33 @@
 'use client'
 
 import { useTRPC } from '@repo/sdk'
-import { useQuery } from '@tanstack/react-query'
+import { Button } from '@repo/ui/components'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import Link from 'next/link'
+import { Suspense } from 'react'
+
+import { DiaryEntryList } from './_components/diary-entry-list.tsx'
 
 export default function Page() {
-  const trpc = useTRPC()
-
-  const me = useQuery(trpc.auth.me.queryOptions())
-
   return (
-    <div>
-      <h1>Hello, world!</h1>
-      <h2>Me</h2>
-      {me.data && (
-        <div>
-          <p>User ID: {me.data.id}</p>
-          <p>Email: {me.data.email}</p>
-        </div>
-      )}
+    <div className="container mx-auto p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">My Diary Entries</h1>
+        <Link href="/create">
+          <Button>Create New Entry</Button>
+        </Link>
+      </div>
+      <Suspense fallback={<div>Loading diary entries...</div>}>
+        <Loader />
+      </Suspense>
     </div>
   )
+}
+
+const Loader = () => {
+  const trpc = useTRPC()
+
+  const { data } = useSuspenseQuery(trpc.diary.list.queryOptions())
+
+  return <>{data && <DiaryEntryList entries={data} />}</>
 }

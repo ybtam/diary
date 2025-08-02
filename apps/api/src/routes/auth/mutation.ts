@@ -37,12 +37,14 @@ const register = publicProcedure.input(insertUserSchema).mutation(async ({ input
 
   const hashedPassword = await bcrypt.hash(input.password, 10)
 
-  const newUser = await db
+  const [newUser] = await db
     .insert(users)
     .values({ ...input, password: hashedPassword })
     .returning()
 
-  return newUser[0]
+  const { accessToken, refreshToken } = generateTokens({ email: newUser.email, userId: newUser.id })
+
+  return { accessToken, expiresIn: 3600, refreshToken }
 })
 
 const generateAccessToken = publicProcedure

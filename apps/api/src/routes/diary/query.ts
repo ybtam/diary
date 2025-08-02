@@ -6,6 +6,9 @@ import { protectedProcedure } from '../../trpc'
 
 const list = protectedProcedure.query(async ({ ctx }) => {
   return db.query.diaryEntries.findMany({
+    columns: {
+      content: false,
+    },
     where: eq(diaryEntries.userId, ctx.user.userId),
   })
 })
