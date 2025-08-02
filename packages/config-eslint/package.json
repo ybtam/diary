@@ -17,12 +17,12 @@
     "lint:fix": "node_modules/.bin/eslint --fix ."
   },
   "devDependencies": {
-    "eslint": "^9.32.0",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.32.0",
-    "@next/eslint-plugin-next": "^15.4.4",
+    "@next/eslint-plugin-next": "^15.4.5",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-config-turbo": "^2.5.5",
     "eslint-plugin-depend": "^1.2.0",
@@ -40,7 +40,6 @@
   },
   "dependencies": {
     "eslint-plugin-unicorn": "^60.0.0",
-    "lucide-react": "^0.525.0",
-    "zod": "^4.0.10"
+    "zod": "^4.0.14"
   }
 }

@@ -11,19 +11,19 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.2.0",
+    "@hookform/resolvers": "^5.2.1",
     "@repo/sdk": "workspace:*",
     "@repo/ui": "workspace:*",
-    "@tanstack/react-pacer": "^0.13.0",
-    "@tanstack/react-query": "^5.83.0",
+    "@tanstack/react-pacer": "^0.14.0",
+    "@tanstack/react-query": "^5.84.1",
     "date-fns": "^4.1.0",
-    "lucide-react": "^0.525.0",
-    "next": "^15.4.4",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-hook-form": "^7.61.1",
+    "lucide-react": "^0.536.0",
+    "next": "^15.4.5",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-hook-form": "^7.62.0",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^4.0.10"
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "@apps/api": "workspace:*",
@@ -32,13 +32,13 @@
     "@repo/config-typescript": "workspace:*",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/node": "^24.1.0",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
     "eslint": "^9.32.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4.1.11",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   }
 }
