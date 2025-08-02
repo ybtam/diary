@@ -1,0 +1,25 @@
+# Development-specific patches for Web deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: diary-web
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: web
+        env:
+        - name: NODE_ENV
+          value: development
+        - name: NEXT_PUBLIC_API_URL
+          value: http://localhost:3001
+        - name: NEXTAUTH_URL
+          value: http://localhost:3000
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "300m"

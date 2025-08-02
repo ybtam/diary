@@ -1,0 +1,31 @@
+# Example Kustomization for Development Environment
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: diary-dev
+
+resources:
+- ../../base/api-deployment.yaml
+- ../../base/web-deployment.yaml
+
+images:
+- name: ghcr.io/your-username/diary/api
+  newTag: main-abc123
+- name: ghcr.io/your-username/diary/web
+  newTag: main-abc123
+
+patchesStrategicMerge:
+- patches/api-dev.yaml
+- patches/web-dev.yaml
+
+configMapGenerator:
+- name: diary-config
+  literals:
+  - API_URL=http://diary-api:3001
+  - NODE_ENV=development
+
+replicas:
+- name: diary-api
+  count: 1
+- name: diary-web
+  count: 1

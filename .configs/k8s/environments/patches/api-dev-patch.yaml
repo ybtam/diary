@@ -1,0 +1,30 @@
+# Development-specific patches for API deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: diary-api
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: api
+        env:
+        - name: NODE_ENV
+          value: development
+        - name: LOG_LEVEL
+          value: debug
+        - name: ENABLE_CORS
+          value: "true"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        # Enable debugging in development
+        ports:
+        - containerPort: 9229
+          name: debug
+          protocol: TCP

@@ -1,0 +1,43 @@
+# Example ArgoCD Application for Development Environment
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: diary-development
+  namespace: argocd
+  labels:
+    environment: development
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/your-username/diary-gitops
+    targetRevision: HEAD
+    path: environments/development
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: diary-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
+---
+# Example Secret for Development
+apiVersion: v1
+kind: Secret
+metadata:
+  name: diary-secrets
+  namespace: diary-dev
+type: Opaque
+stringData:
+  database-url: "postgresql://user:password@postgres:5432/diary_dev"
+  jwt-secret: "dev-jwt-secret-change-in-production"
+  nextauth-secret: "dev-nextauth-secret-change-in-production"

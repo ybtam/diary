@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: diary-postgres
+    environment:
+      POSTGRES_DB: diary
+      POSTGRES_USER: diary_user
+      POSTGRES_PASSWORD: dev_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U diary_user -d diary"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - diary-network
+
+  api:
+    build:
+      context: ../../../
+      dockerfile: apps/api/Dockerfile
+    container_name: diary-api
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://diary_user:dev_password@postgres:5432/diary
+      JWT_SECRET: dev-jwt-secret-change-in-production
+      API_URL: http://localhost:3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ../../../apps/api:/app/apps/api
+      - /app/node_modules
+    networks:
+      - diary-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  web:
+    build:
+      context: ../../../
+      dockerfile: apps/web/Dockerfile
+    container_name: diary-web
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      API_URL: http://api:3001
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: dev-nextauth-secret-change-in-production
+      SESSION_TOKEN_COOKIE_NAME: authjs.session-token
+      CSRF_TOKEN_COOKIE_NAME: authjs.csrf-token
+      CALLBACK_URL_COOKIE_NAME: authjs.callback-url
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ../../../apps/web:/app/apps/web
+      - /app/node_modules
+    networks:
+      - diary-network
+
+  migration:
+    build:
+      context: ../../../
+      dockerfile: apps/db/Dockerfile
+    container_name: diary-migration
+    environment:
+      DATABASE_URL: postgresql://diary_user:dev_password@postgres:5432/diary
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - diary-network
+    command: ["pnpm", "migrate:prod"]
+    restart: "no"
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  diary-network:
+    driver: bridge

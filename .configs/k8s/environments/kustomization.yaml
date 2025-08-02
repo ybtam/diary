@@ -1,0 +1,59 @@
+# Example Kustomization for development environment
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: diary-dev
+
+# Base resources
+resources:
+- ../base/api-deployment.yaml
+- ../base/web-deployment.yaml
+- ../database/postgresql.yaml
+- ../database/init-configmap.yaml
+
+# Images to use (updated by CI/CD)
+images:
+- name: ghcr.io/your-username/diary/api
+  newTag: main-latest
+- name: ghcr.io/your-username/diary/web
+  newTag: main-latest
+- name: ghcr.io/your-username/diary/db-migration
+  newTag: main-latest
+
+# Environment-specific patches
+patchesStrategicMerge:
+- patches/api-dev-patch.yaml
+- patches/web-dev-patch.yaml
+
+# ConfigMap generators
+configMapGenerator:
+- name: diary-config
+  literals:
+  - NODE_ENV=development
+  - API_URL=http://diary-api:3001
+  behavior: merge
+
+# Secret generators (for development only)
+secretGenerator:
+- name: diary-secrets
+  literals:
+  - JWT_SECRET=dev-jwt-secret-change-in-production
+  - NEXTAUTH_SECRET=dev-nextauth-secret-change-in-production
+  type: Opaque
+
+# Resource modifications
+replicas:
+- name: diary-api
+  count: 1
+- name: diary-web
+  count: 1
+
+# Add common labels
+commonLabels:
+  environment: development
+  app.kubernetes.io/part-of: diary
+
+# Add common annotations
+commonAnnotations:
+  managed-by: kustomize
+  environment: development
