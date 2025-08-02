@@ -200,25 +200,18 @@ jobs:
       - name: Update image tags
         run: |
           # Update API image tag
-          if [ -f gitops/k8s/api-deployment.yaml ]; then
-            sed -i "s|image: ${{ env.IMAGE_PREFIX }}/api:.*|image: ${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}|g" gitops/k8s/api-deployment.yaml
+          if [ -f gitops/base/api/deployment.yaml ]; then
+            sed -i "s|image: ${{ env.IMAGE_PREFIX }}/api:.*|image: ${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}|g" gitops/base/api/deployment.yaml
           fi
           
           # Update Web image tag
-          if [ -f gitops/k8s/web-deployment.yaml ]; then
-            sed -i "s|image: ${{ env.IMAGE_PREFIX }}/web:.*|image: ${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}|g" gitops/k8s/web-deployment.yaml
+          if [ -f gitops/base/web/deployment.yaml ]; then
+            sed -i "s|image: ${{ env.IMAGE_PREFIX }}/web:.*|image: ${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}|g" gitops/base/web/deployment.yaml
           fi
           
           # Update DB migration image tag
-          if [ -f gitops/k8s/db-migration-job.yaml ]; then
-            sed -i "s|image: ${{ env.IMAGE_PREFIX }}/db-migration:.*|image: ${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}|g" gitops/k8s/db-migration-job.yaml
-          fi
-          
-          # Alternative: Update docker-compose.yml if using compose
-          if [ -f gitops/docker-compose.yml ]; then
-            sed -i "s|${{ env.IMAGE_PREFIX }}/api:.*|${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}|g" gitops/docker-compose.yml
-            sed -i "s|${{ env.IMAGE_PREFIX }}/web:.*|${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}|g" gitops/docker-compose.yml
-            sed -i "s|${{ env.IMAGE_PREFIX }}/db-migration:.*|${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}|g" gitops/docker-compose.yml
+          if [ -f gitops/base/database/migration-job.yaml ]; then
+            sed -i "s|image: ${{ env.IMAGE_PREFIX }}/db-migration:.*|image: ${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}|g" gitops/base/database/migration-job.yaml
           fi
           
       - name: Commit and push changes
