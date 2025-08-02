@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { auth } from '@repo/sdk'
+import { auth, SessionProvider } from '@repo/sdk'
 
 import '@/style/globals.css'
 import { Spinner } from '@repo/ui'
@@ -58,8 +58,10 @@ const Loader = async ({
   const session = await auth()
 
   return (
-    <Provider accessToken={session?.user?.access_token}>
-      {!session ? publicApp : protectedApp}
-    </Provider>
+    <SessionProvider session={session}>
+      <Provider accessToken={session?.user?.access_token}>
+        {!session ? publicApp : protectedApp}
+      </Provider>
+    </SessionProvider>
   )
 }

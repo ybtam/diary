@@ -40,12 +40,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           expires_at: user.expires_at,
           refresh_token: user.refresh_token,
         }
-      } else if (Date.now() < token.expires_at * 1000) {
-        // Subsequent logins, but the `access_token` is still valid
+      } else if (token.expires_at && Date.now() < token.expires_at * 1000) {
+
         return token
       } else {
         // Subsequent logins, but the `access_token` has expired, try to refresh it
-        if (!token.refresh_token) throw new TypeError('Missing refresh_token')
+
+        if (!token.refresh_token) {
+          token.error = 'RefreshTokenError'
+          return token
+        }
 
         try {
           const res = await trpcClient().auth.generateAccessToken.mutate({
@@ -55,6 +59,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           return {
             ...token,
             access_token: res.accessToken,
+            error: undefined,
             expires_at: Math.floor(Date.now() / 1000 + res.expiresIn),
           }
         } catch (error) {
