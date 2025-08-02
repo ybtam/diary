@@ -39,12 +39,18 @@ export const Tiptap = ({ className, content, onChange, onTitleChange }: TiptapPr
         )
 
         if (headingNode && headingNode.content && headingNode.content.length > 0) {
-          extractedTitle = headingNode.content[0].text
+          const firstTextNode = headingNode.content[0]
+          if (firstTextNode && 'text' in firstTextNode) {
+            extractedTitle = firstTextNode.text
+          }
         } else {
           // If no heading, take the first line of plain text
           const firstParagraph = json.content?.find((node: any) => node.type === 'paragraph')
           if (firstParagraph && firstParagraph.content && firstParagraph.content.length > 0) {
-            extractedTitle = firstParagraph.content[0].text.split('\n')[0]
+            const firstTextNode = firstParagraph.content[0]
+            if (firstTextNode && 'text' in firstTextNode) {
+              extractedTitle = firstTextNode.text.split('\n')[0]
+            }
           }
         }
         onTitleChange(extractedTitle)
