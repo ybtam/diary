@@ -2,6 +2,7 @@ FROM node:24-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
+RUN corepack prepare pnpm@10.14.0 --activate
 
 FROM base AS pruner
 WORKDIR /app
@@ -33,7 +34,7 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 USER nextjs
 
-COPY --from=installer /app/apps/web/next.config.js ./
+COPY --from=installer /app/apps/web/next.config.* ./
 COPY --from=installer /app/apps/web/package.json ./package.json
 
 # Automatically leverage output traces to reduce image size

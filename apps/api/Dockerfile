@@ -22,9 +22,8 @@ COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install
 
-# Build the project
+# Copy source code
 COPY --from=pruner /app/out/full/ .
-RUN pnpm turbo run build --filter=@apps/api...
 
 FROM base AS runner
 WORKDIR /app
@@ -32,16 +31,21 @@ WORKDIR /app
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 api
-USER api
 
-COPY --from=installer /app/apps/api/dist ./
-COPY --from=installer /app/apps/api/package.json ./package.json
+# Copy source code and dependencies
+COPY --from=installer --chown=api:nodejs /app/apps/api/src ./src
+COPY --from=installer --chown=api:nodejs /app/apps/api/package.json ./package.json
+COPY --from=installer --chown=api:nodejs /app/apps/api/tsconfig.json ./tsconfig.json
 
-# Copy only the necessary node_modules
+# Copy node_modules and workspace dependencies
 COPY --from=installer --chown=api:nodejs /app/node_modules ./node_modules
+COPY --from=installer --chown=api:nodejs /app/apps ./apps
+COPY --from=installer --chown=api:nodejs /app/packages ./packages
+
+USER api
 
 EXPOSE 3001
 
 ENV PORT 3001
 
-CMD ["node", "index.js"]
+CMD ["pnpm", "start"]
