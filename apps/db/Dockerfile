@@ -1,48 +1,31 @@
 FROM node:24-alpine AS base
+RUN apk update
+RUN apk add --no-cache libc6-compat
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+RUN npm i -g corepack@latest
 RUN corepack enable
-RUN corepack prepare pnpm@10.14.0 --activate
-
-FROM base AS pruner
+# Set working directory
 WORKDIR /app
-RUN pnpm add -g turbo
+
+FROM base AS builder
+RUN pnpm add -g turbo@^2
 COPY . .
-RUN turbo prune @apps/db --docker
+RUN turbo prune --scope=@apps/db --docker
 
-# Install dependencies
+# Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
-RUN apk add --no-cache libc6-compat
-RUN apk update
-WORKDIR /app
-
-# Copy lockfile and package.json files
+# First install dependencies (as they change less often)
 COPY .gitignore .gitignore
-COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder /app/out/json/ .
 RUN pnpm install
 
-# Copy source files (needed for drizzle-kit)
-COPY --from=pruner /app/out/full/ .
+# Build the project and its dependencies
+COPY --from=builder /app/out/full/ .
+COPY turbo.json turbo.json
 
-# Migration runner stage
-FROM base AS migrator
-WORKDIR /app
+FROM base AS runner
 
-# Don't run as root
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 migrator
+COPY --from=installer ./app ./
 
-# Copy package files and install dependencies (including drizzle-kit)
-COPY --from=installer /app/apps/db/package.json ./package.json
-COPY --from=installer /app/pnpm-lock.yaml ./pnpm-lock.yaml
-RUN pnpm install
-
-# Copy drizzle config and migrations
-COPY --from=installer --chown=migrator:nodejs /app/apps/db/drizzle.config.ts ./drizzle.config.ts
-COPY --from=installer --chown=migrator:nodejs /app/apps/db/src ./src
-
-USER migrator
-
-# Default command runs drizzle-kit migrations
 CMD ["npx", "turbo", "migrate:up"]
