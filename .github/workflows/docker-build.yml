@@ -190,18 +190,52 @@ jobs:
     needs: [build-api, build-web, build-db-migration]
     if: always() && github.ref == 'refs/heads/main' && (needs.build-api.result == 'success' || needs.build-web.result == 'success' || needs.build-db-migration.result == 'success')
     steps:
-      - name: Update GitOps Repository
-        uses: peter-evans/repository-dispatch@v3
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITOPS_TOKEN }}
           repository: ${{ secrets.GITOPS_REPOSITORY }}
-          event-type: update-image
-          client-payload: |
-            {
-              "ref": "${{ github.ref }}",
-              "sha": "${{ github.sha }}",
-              "api_image": "${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}",
-              "web_image": "${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}",
-              "db_migration_image": "${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}",
-              "updated_by": "${{ github.actor }}"
-            }
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
+          
+      - name: Update image tags
+        run: |
+          # Update API image tag
+          if [ -f gitops/k8s/api-deployment.yaml ]; then
+            sed -i "s|image: ${{ env.IMAGE_PREFIX }}/api:.*|image: ${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}|g" gitops/k8s/api-deployment.yaml
+          fi
+          
+          # Update Web image tag
+          if [ -f gitops/k8s/web-deployment.yaml ]; then
+            sed -i "s|image: ${{ env.IMAGE_PREFIX }}/web:.*|image: ${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}|g" gitops/k8s/web-deployment.yaml
+          fi
+          
+          # Update DB migration image tag
+          if [ -f gitops/k8s/db-migration-job.yaml ]; then
+            sed -i "s|image: ${{ env.IMAGE_PREFIX }}/db-migration:.*|image: ${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}|g" gitops/k8s/db-migration-job.yaml
+          fi
+          
+          # Alternative: Update docker-compose.yml if using compose
+          if [ -f gitops/docker-compose.yml ]; then
+            sed -i "s|${{ env.IMAGE_PREFIX }}/api:.*|${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}|g" gitops/docker-compose.yml
+            sed -i "s|${{ env.IMAGE_PREFIX }}/web:.*|${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}|g" gitops/docker-compose.yml
+            sed -i "s|${{ env.IMAGE_PREFIX }}/db-migration:.*|${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}|g" gitops/docker-compose.yml
+          fi
+          
+      - name: Commit and push changes
+        run: |
+          cd gitops
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update images to ${{ github.sha }}
+
+            Updated by: ${{ github.actor }}
+            Ref: ${{ github.ref }}
+            API: ${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}
+            Web: ${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}
+            DB Migration: ${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}"
+            git push
+          fi
