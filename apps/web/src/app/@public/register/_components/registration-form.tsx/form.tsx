@@ -29,7 +29,7 @@ export const RegistrationForm = () => {
       },
       onSuccess: async data => {
         await login(data)
-      }
+      },
     }),
   )
 

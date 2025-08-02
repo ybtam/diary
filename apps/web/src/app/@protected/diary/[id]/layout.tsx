@@ -16,7 +16,6 @@ export default function DiaryLayout({ children }: PropsWithChildren) {
         </Button>
       </div>
       {children}
-
     </div>
   )
 }
