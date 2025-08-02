@@ -9,7 +9,7 @@
   },
   "type": "module",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "lint": "eslint './**'",
@@ -30,7 +30,7 @@
     "lucide-react": "^0.536.0",
     "minio": "^8.0.5",
     "zod": "^4.0.14",
-    "ts-node": "^10.9.2"
+    "tsx": "^4.20.3"
   },
   "devDependencies": {
     "@repo/config-eslint": "workspace:*",

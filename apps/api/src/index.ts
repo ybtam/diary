@@ -1,6 +1,6 @@
 import { client } from '@apps/db'
 
-import { createServer } from './server/index.ts'
+import { createServer } from './server'
 
 client.connect()
 
@@ -17,4 +17,4 @@ const server = createServer()
 })()
 
 export type { AppRouter, RouterInput, RouterOutput } from './server/router.ts'
-z
+
