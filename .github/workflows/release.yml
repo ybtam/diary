@@ -1,19 +1,31 @@
-name: Release
+name: Version
+
 
 on:
   push:
     branches:
       - main
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  release:
-    name: Release
+  version:
+    name: Version
+    if: "!startsWith(github.event.pull_request.title, 'Version Packages')"
+    #    if: |
+    #      !startsWith(github.event.pull_request.title, 'Version Packages') &&
+    #      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup
         uses: ./.github/actions/setup
