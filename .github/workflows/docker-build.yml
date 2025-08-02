@@ -188,7 +188,7 @@ jobs:
     name: Update GitOps Repository
     runs-on: ubuntu-latest
     needs: [build-api, build-web, build-db-migration]
-    if: always() && github.ref == 'refs/heads/main' && (needs.build-api.result == 'success' || needs.build-web.result == 'success' || needs.build-db-migration.result == 'success')
+    if: always() && github.ref == 'refs/heads/main' && (needs.build-api.result == 'success' || needs.build-web.result == 'success' || needs.build-db-migration.result == 'success' || (needs.build-api.result == 'skipped' && needs.build-web.result == 'skipped' && needs.build-db-migration.result == 'skipped'))
     steps:
       - name: Checkout GitOps repository
         uses: actions/checkout@v4
