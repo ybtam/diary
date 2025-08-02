@@ -1,22 +1,26 @@
 'use client'
 
+import { cn } from '@repo/ui/lib'
 import { EditorContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import * as React from 'react'
 
 interface TiptapProps {
+  className?: string
   content: string
   onChange: (content: string) => void
   onTitleChange?: (title: string) => void
 }
 
-export const Tiptap = ({ content, onChange, onTitleChange }: TiptapProps) => {
+export const Tiptap = ({ className, content, onChange, onTitleChange }: TiptapProps) => {
   const editor = useEditor({
     content,
     editorProps: {
       attributes: {
-        class:
+        class: cn(
           'prose dark:prose-invert min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          className,
+        ),
       },
     },
     extensions: [StarterKit],
