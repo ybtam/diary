@@ -1,6 +1,5 @@
 name: Version
 
-
 on:
   push:
     branches:
