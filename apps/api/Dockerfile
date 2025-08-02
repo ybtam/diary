@@ -44,8 +44,8 @@ COPY --from=installer --chown=api:nodejs /app/packages ./packages
 
 USER api
 
-EXPOSE 3001
+EXPOSE 4000
 
-ENV PORT 3001
+ENV PORT 4000
 
 CMD ["pnpm", "start"]
