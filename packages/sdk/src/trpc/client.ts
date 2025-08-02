@@ -10,17 +10,17 @@ import {
 } from '@trpc/client'
 
 // Initialize the tRPC client
-export const trpcClient = (props?: { accessToken?: string }) =>
+export const trpcClient = ({ accessToken, url }: { accessToken?: string; url: string }) =>
   createTRPCClient<AppRouter>({
     links: [
       splitLink({
         condition: op => op.type === 'subscription',
         false: httpBatchStreamLink({
-          headers: props?.accessToken ? { Authorization: `Bearer ${props.accessToken}` } : {},
-          url: process.env.NEXT_PUBLIC_API_URL!,
+          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+          url,
         }),
         true: httpSubscriptionLink({
-          url: process.env.NEXT_PUBLIC_API_URL!,
+          url,
         }),
       }),
     ],

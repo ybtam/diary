@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { auth, SessionProvider } from '@repo/sdk'
+import { auth, DotEnvProvider, SessionProvider } from '@repo/sdk'
 
 import '@/style/globals.css'
 import { Spinner } from '@repo/ui'
@@ -58,10 +58,16 @@ const Loader = async ({
   const session = await auth()
 
   return (
-    <SessionProvider session={session}>
-      <Provider accessToken={session?.user?.access_token}>
-        {!session ? publicApp : protectedApp}
-      </Provider>
-    </SessionProvider>
+    <DotEnvProvider
+      env={{
+        API_URL: process.env.API_URL,
+      }}
+    >
+      <SessionProvider session={session}>
+        <Provider accessToken={session?.user?.access_token}>
+          {!session ? publicApp : protectedApp}
+        </Provider>
+      </SessionProvider>
+    </DotEnvProvider>
   )
 }
