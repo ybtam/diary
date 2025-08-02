@@ -9,6 +9,8 @@ on:
       - 'packages/**'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docker-build.yml'
+  release:
+    types: [published]
 #  pull_request:
 #    branches:
 #      - main
@@ -184,8 +186,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  update-gitops:
-    name: Update GitOps Repository
+  deploy-development:
+    name: Deploy to Development
     runs-on: ubuntu-latest
     needs: [build-api, build-web, build-db-migration]
     if: always() && github.ref == 'refs/heads/main' && (needs.build-api.result == 'success' || needs.build-web.result == 'success' || needs.build-db-migration.result == 'success' || (needs.build-api.result == 'skipped' && needs.build-web.result == 'skipped' && needs.build-db-migration.result == 'skipped'))
@@ -197,19 +199,19 @@ jobs:
           token: ${{ secrets.GITOPS_TOKEN }}
           path: gitops
           
-      - name: Update image tags
+      - name: Update base image tags
         run: |
-          # Update API image tag
+          # Update base API image tag
           if [ -f gitops/base/api/deployment.yaml ]; then
             sed -i "s|image: ${{ env.IMAGE_PREFIX }}/api:.*|image: ${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}|g" gitops/base/api/deployment.yaml
           fi
           
-          # Update Web image tag
+          # Update base Web image tag
           if [ -f gitops/base/web/deployment.yaml ]; then
             sed -i "s|image: ${{ env.IMAGE_PREFIX }}/web:.*|image: ${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}|g" gitops/base/web/deployment.yaml
           fi
           
-          # Update DB migration image tag
+          # Update base DB migration image tag
           if [ -f gitops/base/database/migration-job.yaml ]; then
             sed -i "s|image: ${{ env.IMAGE_PREFIX }}/db-migration:.*|image: ${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}|g" gitops/base/database/migration-job.yaml
           fi
@@ -223,10 +225,101 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Update images to ${{ github.sha }}
+            git commit -m "Deploy to development: ${{ github.sha }}
 
             Updated by: ${{ github.actor }}
-            Ref: ${{ github.ref }}
+            Environment: development
+            Trigger: push to main
+            API: ${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}
+            Web: ${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}
+            DB Migration: ${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}"
+            git push
+          fi
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build-api, build-web, build-db-migration]
+    if: always() && github.event_name == 'release' && (needs.build-api.result == 'success' || needs.build-web.result == 'success' || needs.build-db-migration.result == 'success' || (needs.build-api.result == 'skipped' && needs.build-web.result == 'skipped' && needs.build-db-migration.result == 'skipped'))
+    steps:
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.GITOPS_REPOSITORY }}
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
+          
+      - name: Update staging kustomization
+        run: |
+          # Create or update staging image patches
+          mkdir -p gitops/environments/staging/patches
+          
+          # Create API image patch
+          cat > gitops/environments/staging/patches/api-image.yaml << EOF
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: diary-api
+          spec:
+            template:
+              spec:
+                containers:
+                - name: api
+                  image: ${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}
+          EOF
+          
+          # Create Web image patch
+          cat > gitops/environments/staging/patches/web-image.yaml << EOF
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: diary-web
+          spec:
+            template:
+              spec:
+                containers:
+                - name: web
+                  image: ${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}
+          EOF
+          
+          # Create DB migration image patch
+          cat > gitops/environments/staging/patches/migration-image.yaml << EOF
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: diary-migration
+          spec:
+            template:
+              spec:
+                containers:
+                - name: migration
+                  image: ${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}
+          EOF
+          
+          # Update kustomization.yaml to include image patches
+          if ! grep -q "patches:" gitops/environments/staging/kustomization.yaml; then
+            echo "" >> gitops/environments/staging/kustomization.yaml
+            echo "patches:" >> gitops/environments/staging/kustomization.yaml
+            echo "- patches/api-image.yaml" >> gitops/environments/staging/kustomization.yaml
+            echo "- patches/web-image.yaml" >> gitops/environments/staging/kustomization.yaml
+            echo "- patches/migration-image.yaml" >> gitops/environments/staging/kustomization.yaml
+          fi
+          
+      - name: Commit and push changes
+        run: |
+          cd gitops
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Deploy to staging: ${{ github.event.release.tag_name }}
+
+            Updated by: ${{ github.actor }}
+            Environment: staging
+            Trigger: release published
+            Release: ${{ github.event.release.tag_name }}
             API: ${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}
             Web: ${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}
             DB Migration: ${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}"
