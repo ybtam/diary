@@ -29,7 +29,8 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.536.0",
     "minio": "^8.0.5",
-    "zod": "^4.0.14"
+    "zod": "^4.0.14",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@repo/config-eslint": "workspace:*",
