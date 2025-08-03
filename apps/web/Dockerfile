@@ -8,6 +8,8 @@ RUN corepack enable
 RUN corepack prepare pnpm@10.14.0 --activate
 WORKDIR /app
 
+ENV AUTH_TRUST_HOST=true
+
 FROM base AS pruner
 RUN pnpm add -g turbo
 COPY . .
