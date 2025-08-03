@@ -9,6 +9,7 @@ on:
       - 'packages/**'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docker-build.yml'
+      - 'turbo.json'
   release:
     types: [published]
 #  pull_request:
@@ -46,13 +47,16 @@ jobs:
               - 'apps/db/**'
               - 'packages/**'
               - 'pnpm-lock.yaml'
+              - 'turbo.json'
             web:
               - 'apps/web/**'
               - 'packages/**'
               - 'pnpm-lock.yaml'
+              - 'turbo.json'
             db:
               - 'apps/db/**'
               - 'pnpm-lock.yaml'
+              - 'turbo.json'
 
   build-api:
     name: Build API Image

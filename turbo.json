@@ -38,8 +38,13 @@
     "test": {
       "cache": false
     },
-    "start": {},
+    "start": {
+      "cache": false
+    },
     "migrate:up": {
+      "cache": false
+    },
+    "create-db": {
       "cache": false
     }
   }
