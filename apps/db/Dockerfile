@@ -26,6 +26,11 @@ COPY turbo.json turbo.json
 
 FROM base AS runner
 
-COPY --from=installer ./app ./
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=installer --chown=nextjs:nodejs ./app ./
+
+USER nextjs
 
 CMD ["sh", "-c", "npx turbo create-db && npx turbo migrate:up"]
