@@ -9,7 +9,7 @@
     "migrate:up": "turbo migrate:up",
     "type-check": "turbo type-check",
     "clean": "turbo clean",
-    "test": "turbo test",
+    "test": "turbo test"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
