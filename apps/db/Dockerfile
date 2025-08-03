@@ -29,7 +29,11 @@ FROM base AS runner
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=installer --chown=nextjs:nodejs ./app ./
+# Copy everything from installer stage
+COPY --from=installer --chown=api:nodejs /app .
+
+# Create turbo cache directory with correct permissions
+RUN mkdir -p /app/.turbo/cache && chown -R api:nodejs /app/.turbo
 
 USER nextjs
 
