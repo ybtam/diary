@@ -44,7 +44,7 @@
     "migrate:up": {
       "cache": false
     },
-    "create-db": {
+    "db:create": {
       "cache": false
     }
   }

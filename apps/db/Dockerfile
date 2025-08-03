@@ -38,4 +38,4 @@ RUN mkdir -p /app/.turbo/cache && chown -R nextjs:nodejs /app/.turbo
 
 USER nextjs
 
-CMD ["sh", "-c", "npx turbo create-db && npx turbo migrate:up"]
+CMD ["sh", "-c", "npx turbo db:create && npx turbo migrate:up"]
