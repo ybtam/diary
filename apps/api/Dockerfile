@@ -1,4 +1,7 @@
 FROM node:24-alpine AS base
+RUN apk add --no-cache libc6-compat
+RUN apk update
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -12,9 +15,6 @@ RUN turbo prune @apps/api --docker
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
-RUN apk add --no-cache libc6-compat
-RUN apk update
-
 # First install the dependencies (this is where Docker can cache)
 COPY .gitignore .gitignore
 COPY --from=pruner /app/out/json/ .
@@ -23,6 +23,7 @@ RUN pnpm install
 
 # Copy source code
 COPY --from=pruner /app/out/full/ .
+COPY turbo.json turbo.json
 
 FROM base AS runner
 # Don't run production as root

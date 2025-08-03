@@ -3,12 +3,7 @@ const { Client } = pg
 
 const DB_NAME = process.env.DB_NAME
 
-const client = new Client({
-  host: process.env.DB_HOST,
-  password: process.env.DB_PASSWORD,
-  port: 5432,
-  user: process.env.DB_USERNAME,
-})
+const client = new Client(process.env.DATABASE_URL)
 
 const runCreateDb = async () => {
   await client.connect()

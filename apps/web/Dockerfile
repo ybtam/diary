@@ -1,21 +1,20 @@
 FROM node:24-alpine AS base
+RUN apk add --no-cache libc6-compat
+RUN apk update
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 RUN corepack prepare pnpm@10.14.0 --activate
+WORKDIR /app
 
 FROM base AS pruner
-WORKDIR /app
 RUN pnpm add -g turbo
 COPY . .
 RUN turbo prune web --docker
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
-RUN apk add --no-cache libc6-compat
-RUN apk update
-WORKDIR /app
-
 # First install the dependencies (this is where Docker can cache)
 COPY .gitignore .gitignore
 COPY --from=pruner /app/out/json/ .
@@ -24,11 +23,10 @@ RUN pnpm install
 
 # Build the project
 COPY --from=pruner /app/out/full/ .
+COPY turbo.json turbo.json
 RUN pnpm turbo run build --filter=web...
 
 FROM base AS runner
-WORKDIR /app
-
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
