@@ -201,18 +201,18 @@ jobs:
           
       - name: Update base image tags
         run: |
-          # Update base API image tag
-          if [ -f gitops/base/api/deployment.yaml ]; then
+          # Update base API image tag only if API was built
+          if [ "${{ needs.build-api.result }}" == "success" ] && [ -f gitops/base/api/deployment.yaml ]; then
             sed -i "s|image: ${{ env.IMAGE_PREFIX }}/api:.*|image: ${{ env.IMAGE_PREFIX }}/api:${{ github.sha }}|g" gitops/base/api/deployment.yaml
           fi
           
-          # Update base Web image tag
-          if [ -f gitops/base/web/deployment.yaml ]; then
+          # Update base Web image tag only if Web was built
+          if [ "${{ needs.build-web.result }}" == "success" ] && [ -f gitops/base/web/deployment.yaml ]; then
             sed -i "s|image: ${{ env.IMAGE_PREFIX }}/web:.*|image: ${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}|g" gitops/base/web/deployment.yaml
           fi
           
-          # Update base DB migration image tag
-          if [ -f gitops/base/database/migration-job.yaml ]; then
+          # Update base DB migration image tag only if DB was built
+          if [ "${{ needs.build-db-migration.result }}" == "success" ] && [ -f gitops/base/database/migration-job.yaml ]; then
             sed -i "s|image: ${{ env.IMAGE_PREFIX }}/db-migration:.*|image: ${{ env.IMAGE_PREFIX }}/db-migration:${{ github.sha }}|g" gitops/base/database/migration-job.yaml
           fi
           
