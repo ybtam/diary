@@ -28,4 +28,4 @@ FROM base AS runner
 
 COPY --from=installer ./app ./
 
-CMD ["npx", "turbo", "migrate:up"]
+CMD ["sh", "-c", "npx turbo create-db && npx turbo migrate:up"]
