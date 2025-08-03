@@ -26,5 +26,9 @@ export const createServer = () => {
     } satisfies FastifyTRPCPluginOptions<AppRouter>['trpcOptions'],
   })
 
+  server.get('/health', async (request, reply) => {
+    return { status: 'ok', timestamp: new Date().toISOString() }
+  })
+
   return server
 }
